@@ -1,0 +1,9 @@
+This is a Rust implementation of the GNU coreutils package.
+
+This is not a comprehensive substitution, but will be built out into a decent 
+collection over time.
+
+-------------------------------------------------------------------------------
+
+TODO:
+- Work out how to get these to install on a system to replace the C version
