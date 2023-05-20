@@ -1,0 +1,11 @@
+A list of programs that make sense to be converted first (prioritisation is
+read-only programs):
+- cat
+- du
+- ls
+- nproc
+- od 
+- pwd
+- uname
+- whoami
+

@@ -1,0 +1,11 @@
+doc_comment_code_block_width = 80
+force_multi_line_blocks = true
+format_code_in_doc_comments = true
+format_strings = true
+max_width = 80
+match_block_trailing_comma = true
+normalize_comments = true
+normalize_doc_attributes = true
+single_line_if_else_max_line_length = 0
+struct_lit_single_line = false
+wrap_comments = true
