@@ -1,6 +1,6 @@
 use crate::flags::Flags;
 use core::str::FromStr;
-use std::fs;
+use std::{env::Args, fs};
 
 // TODO: Handle reading from stdin
 #[derive(Debug)]
@@ -13,15 +13,19 @@ pub struct Engine {
 }
 
 impl Engine {
-    pub fn new(args: Vec<String>) -> Engine {
+    pub fn new(args: Args) -> Engine {
+        // TODO: There's a chance here that we want to move this allocation
+        //       further down the call stack.
+        let args = args.collect::<Vec<String>>()[1..].to_vec();
+
         Engine {
             file: Engine::read_file_from_arg(&args),
-            // TODO: In an idea world we wouldn't convert this to a string, and
-            //       just keep the references intact.
-            file_name: Engine::get_file_name(&args).to_string(),
+            file_name: Engine::get_file_name(&args).to_owned(),
             flag: if &args.len() > &1 {
                 Some(
                     Flags::from_str(&args.get(0).unwrap())
+                        // TODO: Don't panic here and just provide an error
+                        //       message
                         .expect("Could not parse flag"),
                 )
             } else {

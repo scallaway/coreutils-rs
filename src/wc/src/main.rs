@@ -12,15 +12,7 @@ use std::{env, time::Instant};
 fn main() {
     let now = Instant::now();
 
-    // TODO: There's an "argument" (ha) for passing this down as Args instead
-    //       of a Vec<String> - this would _probably_ be more idiomatic.
-    let args = env::args()
-        .collect::<Vec<String>>()
-        // Skip the first argument as that's the name of the program.
-        [1..]
-        .to_vec();
-
-    let wc = Engine::new(args);
+    let wc = Engine::new(env::args());
 
     wc.run();
 
