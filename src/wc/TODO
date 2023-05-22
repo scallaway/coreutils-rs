@@ -1,0 +1,10 @@
+** Functionality **
+
+Need to be able to read from stdin.
+
+** Performance Improvements **
+
+Rudimentary testing reveals that there are some performance improvements to be
+made when reading the number of bytes in the file. This should be retrievable  
+from the file metadata, without reading in the file. This will require a 
+change in the order of initialisation of the program.
