@@ -1,10 +1,37 @@
 ** Functionality **
 
-Need to be able to read from stdin.
+These requirements are listed in priority order
 
-** Performance Improvements **
+- Read from stdin.
 
-Rudimentary testing reveals that there are some performance improvements to be
-made when reading the number of bytes in the file. This should be retrievable  
-from the file metadata, without reading in the file. This will require a 
-change in the order of initialisation of the program.
+    The input that comes from stdin will be _in place_ of the file name that 
+    would usually be provided as an arg. Therefore the relevant path will need
+    to be build.
+
+- Correctly handle unhappy-paths
+
+    Throughout the Engine, there are loads of instances of calling .expect() 
+    which will just result in the program panicing and crashing. This needs to
+    be updated to have proper error messages sent back to the user.
+
+    Even if the first step is to just default to something like "Unknown
+    command, please try again" - that's better than the program fully crashing.
+
+- Handle multiple flags
+
+    This will require a bit more reordering of the way that flags are handled
+    internally, as well as the way that the output is rendered.
+
+- Write tests
+
+    Currently the program is woefully under-tested, and so there needs to be
+    some way of verifying that changes don't break existing code. Fairly
+    complete tests should be written.
+
+- Potentially read file into something other than a String
+
+    Currently, the program uses fs::read_file_to_string() for instances when it
+    needs to calculate line, word and character counts. But that might not be
+    the fastest way do things, as iterating over a Vec<u8> (which is provided
+    by fs::read()) might lead to some performance gains as well.
+
