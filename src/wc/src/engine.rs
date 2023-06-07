@@ -24,9 +24,8 @@ impl Engine {
             file_name,
             flag: if &args.len() > &1 {
                 Some(
-                    Flags::from_str(&args.get(0).unwrap())
-                        // TODO: Don't panic here and just provide an error
-                        //       message
+                    Flags::from_str(&get_flag_from_args(&args))
+                        // TODO: Don't panic here
                         .expect("Could not parse flag"),
                 )
             } else {
@@ -93,4 +92,14 @@ fn get_file_name_from_args(args: &Vec<String>) -> String {
         .expect("File name was not supplied with invocation of program")
         .to_owned();
 }
+
+/// Returns the first string that it find that does start with a hyphen
+fn get_flag_from_args(args: &Vec<String>) -> String {
+    return args
+        .iter()
+        .find(|&arg| arg.starts_with("-"))
+        .unwrap()
+        .to_owned();
+}
+
 // TODO: Write tests for this
