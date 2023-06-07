@@ -6,21 +6,22 @@ use std::{env::Args, fs};
 #[derive(Debug)]
 pub struct Engine {
     pub file_name: String,
-    pub file: String,
     // This is optional as there may not be any flags, in the event that we're
     // just displaying the default values
     pub flag: Option<Flags>,
 }
 
+/// The beating heart of the program, where all the computation takes place
 impl Engine {
     pub fn new(args: Args) -> Engine {
-        // TODO: There's a chance here that we want to move this allocation
-        //       further down the call stack.
+        // We can always start from the second argument in the list as the
+        // first is _always_ the program name
         let args = args.collect::<Vec<String>>()[1..].to_vec();
 
+        let file_name = get_file_name_from_args(&args);
+
         Engine {
-            file: Engine::read_file_from_arg(&args),
-            file_name: Engine::get_file_name(&args).to_owned(),
+            file_name,
             flag: if &args.len() > &1 {
                 Some(
                     Flags::from_str(&args.get(0).unwrap())
@@ -41,19 +42,28 @@ impl Engine {
         }
 
         let statistic = match self.flag.unwrap() {
-            Flags::Bytes => self.file.as_bytes().len(),
-            Flags::Lines => self.file.lines().count(),
-            Flags::Chars => self.file.chars().collect::<Vec<char>>().len(),
-            Flags::Words => self.get_word_count(),
+            Flags::Bytes => fs::metadata(&self.file_name)
+                .expect("Couldn't find file specified")
+                .len() as usize,
+            Flags::Lines => self.read_file(&self.file_name).lines().count(),
+            Flags::Chars => self
+                .read_file(&self.file_name)
+                .chars()
+                .collect::<Vec<char>>()
+                .len(),
+            Flags::Words => {
+                self.get_word_count(&self.read_file(&self.file_name))
+            },
         };
 
         println!("{}", format!("{} {}", statistic, self.file_name));
     }
 
     fn run_default(&self) {
-        let lines = self.file.lines().count();
-        let words = self.get_word_count();
-        let bytes = self.file.as_bytes().len();
+        let file = self.read_file(&self.file_name);
+        let lines = file.lines().count();
+        let words = self.get_word_count(&file);
+        let bytes = file.as_bytes().len();
 
         println!(
             "{}",
@@ -61,28 +71,26 @@ impl Engine {
         );
     }
 
-    // We read the file into a string, as we can simply convert to bytes
-    // when required, and that's faster than storing the file in two different
-    // formats in memory
-    fn read_file_from_arg(args: &Vec<String>) -> String {
-        // TODO: Actually handle this error
-        fs::read_to_string(Engine::get_file_name(args))
-            .expect("Unable to find file")
+    // Read the file into a String here as it makes it easier to work with
+    fn read_file(&self, file_name: &String) -> String {
+        // TODO: Don't panic
+        fs::read_to_string(file_name).expect("Unable to find file")
     }
 
-    fn get_file_name(args: &Vec<String>) -> &String {
-        if args.get(1).is_none() {
-            args.get(0).unwrap()
-        } else {
-            args.get(1).unwrap()
-        }
-    }
-
-    fn get_word_count(&self) -> usize {
-        self.file.lines().fold(0, |acc, line| {
+    fn get_word_count(&self, file: &String) -> usize {
+        file.lines().fold(0, |acc, line| {
             acc + line.split_whitespace().collect::<Vec<&str>>().len()
         })
     }
 }
 
+// TODO: Probably move this elsewhere
+/// Returns the first string that it finds that doesn't start with a hyphen
+fn get_file_name_from_args(args: &Vec<String>) -> String {
+    return args
+        .iter()
+        .find(|&arg| !arg.starts_with("-"))
+        .expect("File name was not supplied with invocation of program")
+        .to_owned();
+}
 // TODO: Write tests for this
