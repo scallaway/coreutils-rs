@@ -6,6 +6,7 @@ pub enum Flags {
     Lines,
     Bytes,
     Chars,
+    LongestLine,
 }
 
 impl FromStr for Flags {
@@ -18,6 +19,7 @@ impl FromStr for Flags {
             "-l" => Ok(Flags::Lines),
             "-w" => Ok(Flags::Words),
             "-m" => Ok(Flags::Chars),
+            "-L" => Ok(Flags::LongestLine),
             _ => Err(()),
         }
     }

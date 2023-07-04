@@ -53,6 +53,9 @@ impl Engine {
             Flags::Words => {
                 self.get_word_count(&self.read_file(&self.file_name))
             },
+            Flags::LongestLine => {
+                self.get_longest_line(&self.read_file(&self.file_name))
+            },
         };
 
         println!("{}", format!("{} {}", statistic, self.file_name));
@@ -80,6 +83,19 @@ impl Engine {
         file.lines().fold(0, |acc, line| {
             acc + line.split_whitespace().collect::<Vec<&str>>().len()
         })
+    }
+
+    fn get_longest_line(&self, file: &String) -> usize {
+        file.lines().fold(
+            0,
+            |acc, line| {
+                if line.len() > acc {
+                    line.len()
+                } else {
+                    acc
+                }
+            },
+        )
     }
 }
 
