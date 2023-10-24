@@ -63,7 +63,7 @@ impl Engine {
 
     fn run_default(&self) {
         let file = self.read_file(&self.file_name);
-        let lines = file.lines().count();
+        let lines = get_adjusted_line_count(&file);
         let words = self.get_word_count(&file);
         let bytes = file.as_bytes().len();
 
@@ -80,7 +80,9 @@ impl Engine {
     }
 
     fn get_word_count(&self, file: &String) -> usize {
-        file.lines().fold(0, |acc, line| {
+        let lines = file.lines();
+        let line_count = lines.clone().count();
+        lines.take(line_count - 1).fold(0, |acc, line| {
             acc + line.split_whitespace().collect::<Vec<&str>>().len()
         })
     }
@@ -97,6 +99,25 @@ impl Engine {
             },
         )
     }
+}
+
+/// The bash implementation of wc doesn't count empty lines (this includes
+/// lines that only contain the NULL character), so we have to account for
+/// that here.
+fn get_adjusted_line_count(file: &String) -> usize {
+    let base_count = file.lines().count();
+
+    if base_count > 1 {
+        return base_count;
+    }
+
+    let line = file.lines().next().expect("Couldn't read line");
+
+    return if line.trim_matches('\0').is_empty() {
+        0
+    } else {
+        1
+    };
 }
 
 // TODO: Probably move this elsewhere
